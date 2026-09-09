@@ -43,7 +43,11 @@ app_license = "mit"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {
+	"Item": "public/js/item.js",
+	"Customer": "public/js/customer.js",
+	"Supplier": "public/js/supplier.js",
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -136,6 +140,12 @@ app_license = "mit"
 # Document Events
 # ---------------
 # Hook on document methods and events
+
+doc_events = {
+	"Item": {"validate": "hivefoods.tax_defaults.set_item_tax_defaults"},
+	"Customer": {"validate": "hivefoods.tax_defaults.set_party_tax_category"},
+	"Supplier": {"validate": "hivefoods.tax_defaults.set_party_tax_category"},
+}
 
 # doc_events = {
 # 	"*": {
