@@ -1,0 +1,24 @@
+{
+ "actions": [],
+ "creation": "2026-09-09 12:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": ["company", "receiving_warehouse", "selling_price_list"],
+ "fields": [
+  {"fieldname": "company", "fieldtype": "Link", "in_list_view": 1, "label": "Company", "options": "Company", "reqd": 1},
+  {"fieldname": "receiving_warehouse", "fieldtype": "Link", "in_list_view": 1, "label": "Receiving Warehouse", "options": "Warehouse", "reqd": 1, "description": "Warehouse where stock from the inter-company Purchase Invoice is received"},
+  {"fieldname": "selling_price_list", "fieldtype": "Link", "in_list_view": 1, "label": "Selling Price List", "options": "Price List", "description": "Item Price is updated in this list. Blank = Standard Selling"}
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-09-09 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Hivefoods",
+ "name": "Hivefoods Company Setting",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

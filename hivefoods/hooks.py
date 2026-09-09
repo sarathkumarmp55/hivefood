@@ -145,6 +145,10 @@ doc_events = {
 	"Item": {"validate": "hivefoods.tax_defaults.set_item_tax_defaults"},
 	"Customer": {"validate": "hivefoods.tax_defaults.set_party_tax_category"},
 	"Supplier": {"validate": "hivefoods.tax_defaults.set_party_tax_category"},
+	"Sales Invoice": {
+		"on_submit": "hivefoods.intercompany.on_sales_invoice_submit",
+		"on_cancel": "hivefoods.intercompany.on_sales_invoice_cancel",
+	},
 }
 
 # doc_events = {

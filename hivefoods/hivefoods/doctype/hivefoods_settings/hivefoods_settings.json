@@ -1,0 +1,34 @@
+{
+ "actions": [],
+ "creation": "2026-09-09 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "inter_company_section", "auto_create_purchase_invoice", "delete_draft_on_cancel", "column_break_1",
+  "update_selling_price", "profit_percentage", "company_section", "company_settings"
+ ],
+ "fields": [
+  {"fieldname": "inter_company_section", "fieldtype": "Section Break", "label": "Inter-Company Sales (Head Office to Branch)"},
+  {"fieldname": "auto_create_purchase_invoice", "fieldtype": "Check", "label": "Auto Create Purchase Invoice in Branch (Draft)", "default": "1", "description": "When a Sales Invoice to an internal customer of another company is submitted, create the matching Purchase Invoice (or Debit Note for returns) as a draft in that company"},
+  {"fieldname": "delete_draft_on_cancel", "fieldtype": "Check", "label": "Delete Draft Purchase Invoice when Sales Invoice is Cancelled", "default": "1"},
+  {"fieldname": "column_break_1", "fieldtype": "Column Break"},
+  {"fieldname": "update_selling_price", "fieldtype": "Check", "label": "Update Branch Selling Price from Purchase Rate", "default": "1", "description": "Selling rate = inter-company purchase rate + profit %. The previous Item Price is closed (Valid Upto = day before) and a new one starts on the invoice date"},
+  {"fieldname": "profit_percentage", "fieldtype": "Percent", "label": "Item Profit Percentage", "depends_on": "update_selling_price", "mandatory_depends_on": "update_selling_price"},
+  {"fieldname": "company_section", "fieldtype": "Section Break", "label": "Branch Company Defaults"},
+  {"fieldname": "company_settings", "fieldtype": "Table", "label": "Company Settings", "options": "Hivefoods Company Setting", "description": "Receiving warehouse and selling price list per branch company. If a company is missing, the warehouse of its POS Profile and Standard Selling are used"}
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-09-09 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Hivefoods",
+ "name": "Hivefoods Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {"create": 1, "delete": 1, "email": 1, "print": 1, "read": 1, "role": "System Manager", "share": 1, "write": 1},
+  {"create": 1, "email": 1, "print": 1, "read": 1, "role": "Accounts Manager", "share": 1, "write": 1}
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
