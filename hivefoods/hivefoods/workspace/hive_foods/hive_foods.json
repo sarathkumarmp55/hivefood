@@ -1,0 +1,306 @@
+{
+ "doctype": "Workspace",
+ "name": "Hive Foods",
+ "title": "Hive Foods",
+ "label": "Hive Foods",
+ "module": "Hivefoods",
+ "public": 1,
+ "is_hidden": 0,
+ "sequence_id": 7.0,
+ "icon": "tool",
+ "for_user": "",
+ "parent_page": "",
+ "content": "[{\"id\": \"h1\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Hive Foods</b></span>\", \"col\": 12}}, {\"id\": \"nc_production_today\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Production Today\", \"col\": 3}}, {\"id\": \"nc_draft_branch_purchas\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Draft Branch Purchase Invoices\", \"col\": 3}}, {\"id\": \"nc_pos_sales_today\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"POS Sales Today\", \"col\": 3}}, {\"id\": \"nc_finished_goods_stock\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Finished Goods Stock Value (HO)\", \"col\": 3}}, {\"id\": \"h2\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Quick Access</b></span>\", \"col\": 12}}, {\"id\": \"sc_central_kitchen_prod\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Central Kitchen Production\", \"col\": 3}}, {\"id\": \"sc_bom_(recipes)\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"BOM (Recipes)\", \"col\": 3}}, {\"id\": \"sc_item\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Item\", \"col\": 3}}, {\"id\": \"sc_stock_entry\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Stock Entry\", \"col\": 3}}, {\"id\": \"sc_sales_invoice\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Sales Invoice\", \"col\": 3}}, {\"id\": \"sc_purchase_invoice\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Purchase Invoice\", \"col\": 3}}, {\"id\": \"sc_pos_invoice\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"POS Invoice\", \"col\": 3}}, {\"id\": \"sc_stock_balance\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Stock Balance\", \"col\": 3}}, {\"id\": \"sc_hivefoods_settings\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Hivefoods Settings\", \"col\": 3}}, {\"id\": \"h3\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Masters & Reports</b></span>\", \"col\": 12}}, {\"id\": \"cb_production\", \"type\": \"card\", \"data\": {\"card_name\": \"Production\", \"col\": 4}}, {\"id\": \"cb_head_office_to_branc\", \"type\": \"card\", \"data\": {\"card_name\": \"Head Office to Branch\", \"col\": 4}}, {\"id\": \"cb_retail\", \"type\": \"card\", \"data\": {\"card_name\": \"Retail\", \"col\": 4}}, {\"id\": \"cb_reports\", \"type\": \"card\", \"data\": {\"card_name\": \"Reports\", \"col\": 4}}]",
+ "shortcuts": [
+  {
+   "label": "Central Kitchen Production",
+   "type": "DocType",
+   "link_to": "Central Kitchen Production",
+   "color": "Green",
+   "doc_view": ""
+  },
+  {
+   "label": "BOM (Recipes)",
+   "type": "DocType",
+   "link_to": "BOM",
+   "color": "",
+   "doc_view": ""
+  },
+  {
+   "label": "Item",
+   "type": "DocType",
+   "link_to": "Item",
+   "color": "",
+   "doc_view": ""
+  },
+  {
+   "label": "Stock Entry",
+   "type": "DocType",
+   "link_to": "Stock Entry",
+   "color": "",
+   "doc_view": ""
+  },
+  {
+   "label": "Sales Invoice",
+   "type": "DocType",
+   "link_to": "Sales Invoice",
+   "color": "",
+   "doc_view": ""
+  },
+  {
+   "label": "Purchase Invoice",
+   "type": "DocType",
+   "link_to": "Purchase Invoice",
+   "color": "",
+   "doc_view": ""
+  },
+  {
+   "label": "POS Invoice",
+   "type": "DocType",
+   "link_to": "POS Invoice",
+   "color": "",
+   "doc_view": ""
+  },
+  {
+   "label": "Stock Balance",
+   "type": "Report",
+   "link_to": "Stock Balance",
+   "color": "",
+   "doc_view": ""
+  },
+  {
+   "label": "Hivefoods Settings",
+   "type": "DocType",
+   "link_to": "Hivefoods Settings",
+   "color": "",
+   "doc_view": ""
+  }
+ ],
+ "number_cards": [
+  {
+   "label": "Production Today",
+   "number_card_name": "Production Today"
+  },
+  {
+   "label": "Draft Branch Purchase Invoices",
+   "number_card_name": "Draft Branch Purchase Invoices"
+  },
+  {
+   "label": "POS Sales Today",
+   "number_card_name": "POS Sales Today"
+  },
+  {
+   "label": "Finished Goods Stock Value (HO)",
+   "number_card_name": "Finished Goods Stock Value (HO)"
+  }
+ ],
+ "links": [
+  {
+   "type": "Card Break",
+   "label": "Production",
+   "link_type": null,
+   "link_to": null,
+   "hidden": 0,
+   "is_query_report": 0,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Link",
+   "label": "Central Kitchen Production",
+   "link_type": "DocType",
+   "link_to": "Central Kitchen Production",
+   "hidden": 0,
+   "is_query_report": 0,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Link",
+   "label": "BOM",
+   "link_type": "DocType",
+   "link_to": "BOM",
+   "hidden": 0,
+   "is_query_report": 0,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Link",
+   "label": "Item",
+   "link_type": "DocType",
+   "link_to": "Item",
+   "hidden": 0,
+   "is_query_report": 0,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Link",
+   "label": "Stock Entry",
+   "link_type": "DocType",
+   "link_to": "Stock Entry",
+   "hidden": 0,
+   "is_query_report": 0,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Card Break",
+   "label": "Head Office to Branch",
+   "link_type": null,
+   "link_to": null,
+   "hidden": 0,
+   "is_query_report": 0,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Link",
+   "label": "Sales Invoice",
+   "link_type": "DocType",
+   "link_to": "Sales Invoice",
+   "hidden": 0,
+   "is_query_report": 0,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Link",
+   "label": "Purchase Invoice",
+   "link_type": "DocType",
+   "link_to": "Purchase Invoice",
+   "hidden": 0,
+   "is_query_report": 0,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Link",
+   "label": "Item Price",
+   "link_type": "DocType",
+   "link_to": "Item Price",
+   "hidden": 0,
+   "is_query_report": 0,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Link",
+   "label": "Hivefoods Settings",
+   "link_type": "DocType",
+   "link_to": "Hivefoods Settings",
+   "hidden": 0,
+   "is_query_report": 0,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Card Break",
+   "label": "Retail",
+   "link_type": null,
+   "link_to": null,
+   "hidden": 0,
+   "is_query_report": 0,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Link",
+   "label": "POS Invoice",
+   "link_type": "DocType",
+   "link_to": "POS Invoice",
+   "hidden": 0,
+   "is_query_report": 0,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Link",
+   "label": "POS Opening Entry",
+   "link_type": "DocType",
+   "link_to": "POS Opening Entry",
+   "hidden": 0,
+   "is_query_report": 0,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Link",
+   "label": "POS Closing Entry",
+   "link_type": "DocType",
+   "link_to": "POS Closing Entry",
+   "hidden": 0,
+   "is_query_report": 0,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Link",
+   "label": "POS Profile",
+   "link_type": "DocType",
+   "link_to": "POS Profile",
+   "hidden": 0,
+   "is_query_report": 0,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Card Break",
+   "label": "Reports",
+   "link_type": null,
+   "link_to": null,
+   "hidden": 0,
+   "is_query_report": 0,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Link",
+   "label": "Stock Balance",
+   "link_type": "Report",
+   "link_to": "Stock Balance",
+   "hidden": 0,
+   "is_query_report": 1,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Link",
+   "label": "Stock Ledger",
+   "link_type": "Report",
+   "link_to": "Stock Ledger",
+   "hidden": 0,
+   "is_query_report": 1,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Link",
+   "label": "Sales Register",
+   "link_type": "Report",
+   "link_to": "Sales Register",
+   "hidden": 0,
+   "is_query_report": 1,
+   "onboard": 0,
+   "link_count": 0
+  },
+  {
+   "type": "Link",
+   "label": "Gross Profit",
+   "link_type": "Report",
+   "link_to": "Gross Profit",
+   "hidden": 0,
+   "is_query_report": 1,
+   "onboard": 0,
+   "link_count": 0
+  }
+ ],
+ "roles": [],
+ "owner": "Administrator",
+ "modified_by": "Administrator",
+ "creation": "2026-09-14 14:00:00.000000",
+ "modified": "2026-09-14 14:00:00.000000",
+ "docstatus": 0,
+ "idx": 0
+}

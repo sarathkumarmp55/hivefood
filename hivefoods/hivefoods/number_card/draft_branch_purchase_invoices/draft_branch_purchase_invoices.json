@@ -1,0 +1,21 @@
+{
+ "doctype": "Number Card",
+ "name": "Draft Branch Purchase Invoices",
+ "label": "Draft Branch Purchase Invoices",
+ "document_type": "Purchase Invoice",
+ "function": "Count",
+ "type": "Document Type",
+ "is_public": 1,
+ "is_standard": 1,
+ "module": "Hivefoods",
+ "show_percentage_stats": 1,
+ "stats_time_interval": "Daily",
+ "color": "#FFA00A",
+ "filters_json": "[[\"Purchase Invoice\", \"docstatus\", \"=\", 0, false], [\"Purchase Invoice\", \"is_internal_supplier\", \"=\", 1, false]]",
+ "owner": "Administrator",
+ "modified_by": "Administrator",
+ "creation": "2026-09-14 14:00:00.000000",
+ "modified": "2026-09-14 14:00:00.000000",
+ "docstatus": 0,
+ "idx": 0
+}

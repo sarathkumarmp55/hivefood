@@ -1,0 +1,22 @@
+{
+ "doctype": "Number Card",
+ "name": "Finished Goods Stock Value (HO)",
+ "label": "Finished Goods Stock Value (HO)",
+ "document_type": "Bin",
+ "function": "Sum",
+ "type": "Document Type",
+ "is_public": 1,
+ "is_standard": 1,
+ "module": "Hivefoods",
+ "show_percentage_stats": 1,
+ "stats_time_interval": "Daily",
+ "color": "#7B61FF",
+ "filters_json": "[[\"Bin\", \"warehouse\", \"=\", \"Finished Goods - HIL\", false]]",
+ "owner": "Administrator",
+ "modified_by": "Administrator",
+ "creation": "2026-09-14 14:00:00.000000",
+ "modified": "2026-09-14 14:00:00.000000",
+ "docstatus": 0,
+ "idx": 0,
+ "aggregate_function_based_on": "stock_value"
+}

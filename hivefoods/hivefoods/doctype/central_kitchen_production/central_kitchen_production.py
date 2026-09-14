@@ -22,6 +22,7 @@ class CentralKitchenProduction(Document):
 			self.produced_qty = flt(self.batches) * flt(self.bom_quantity)
 		self.set_required_qty()
 		self.set_raw_material_rates()
+		self.set_additional_costs()
 		self.set_default_output()
 		self.validate_outputs()
 		self.allocate_output_cost()
@@ -51,6 +52,7 @@ class CentralKitchenProduction(Document):
 	def set_raw_material_rates(self):
 		self.total_raw_cost = 0
 		for row in self.raw_materials:
+			row.uom = frappe.get_cached_value("Item", row.item_code, "stock_uom")
 			if flt(row.qty) <= 0:
 				frappe.throw(_("Row {0}: Actual Qty must be greater than 0").format(row.idx))
 			row.rate = get_valuation_rate(
@@ -59,6 +61,17 @@ class CentralKitchenProduction(Document):
 			row.amount = flt(row.qty) * flt(row.rate)
 			self.total_raw_cost += row.amount
 		self.total_raw_cost = flt(self.total_raw_cost, self.precision("total_raw_cost"))
+
+	def set_additional_costs(self):
+		self.total_additional_cost = 0
+		for row in self.additional_costs:
+			if flt(row.amount) <= 0:
+				frappe.throw(_("Additional cost row {0}: Amount must be greater than 0").format(row.idx))
+			if frappe.db.get_value("Account", row.expense_account, "company") != self.company:
+				frappe.throw(_("Additional cost row {0}: account does not belong to {1}").format(row.idx, self.company))
+			self.total_additional_cost += flt(row.amount)
+		self.total_additional_cost = flt(self.total_additional_cost, self.precision("total_additional_cost"))
+		self.total_cost = flt(flt(self.total_raw_cost) + self.total_additional_cost, self.precision("total_cost"))
 
 	def set_default_output(self):
 		"""No packed outputs entered: the bulk product itself is received."""
@@ -98,15 +111,20 @@ class CentralKitchenProduction(Document):
 			)
 
 	def allocate_output_cost(self):
+		"""Split raw cost (posted as basic rate) and total cost (shown to the user) by weight."""
 		total_weight = flt(self.total_output_weight)
 		precision = self.precision("total_raw_cost")
-		allocated = 0
+		allocated_raw = allocated_total = 0
 		for i, row in enumerate(self.outputs):
 			if i == len(self.outputs) - 1:
-				row.amount = flt(self.total_raw_cost - allocated, precision)
+				row.raw_amount = flt(flt(self.total_raw_cost) - allocated_raw, precision)
+				row.amount = flt(flt(self.total_cost) - allocated_total, precision)
 			else:
-				row.amount = flt(self.total_raw_cost * flt(row.total_weight) / total_weight, precision) if total_weight else 0
-				allocated += row.amount
+				share = flt(row.total_weight) / total_weight if total_weight else 0
+				row.raw_amount = flt(flt(self.total_raw_cost) * share, precision)
+				row.amount = flt(flt(self.total_cost) * share, precision)
+				allocated_raw += row.raw_amount
+				allocated_total += row.amount
 			row.rate = flt(row.amount / flt(row.qty), 6) if row.qty else 0
 
 	# ----------------------------------------------------------------- submit / cancel
@@ -153,10 +171,19 @@ class CentralKitchenProduction(Document):
 					"t_warehouse": self.target_warehouse,
 					"is_finished_item": 1,
 					"set_basic_rate_manually": 1,
-					"basic_rate": row.rate,
-					"basic_amount": row.amount,
-					"amount": row.amount,
+					"basic_rate": flt(row.raw_amount / flt(row.qty), 6) if row.qty else 0,
+					"basic_amount": row.raw_amount,
+					"amount": row.raw_amount,
 					"conversion_factor": 1,
+				},
+			)
+		for row in self.additional_costs:
+			se.append(
+				"additional_costs",
+				{
+					"expense_account": row.expense_account,
+					"description": row.description or row.expense_account,
+					"amount": row.amount,
 				},
 			)
 		se.flags.ignore_permissions = True
@@ -203,7 +230,7 @@ def get_bom_materials(bom, batches=1):
 			{
 				"item_code": d.item_code,
 				"item_name": d.item_name,
-				"uom": d.stock_uom,
+				"uom": frappe.get_cached_value("Item", d.item_code, "stock_uom"),
 				"required_qty": flt(d.stock_qty) * factor,
 				"qty": flt(d.stock_qty) * factor,
 			}

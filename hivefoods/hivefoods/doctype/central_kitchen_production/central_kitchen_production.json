@@ -1,47 +1,306 @@
 {
- "actions": [], "autoname": "format:CKP-{YY}-{#####}", "creation": "2026-09-14 12:00:00.000000", "doctype": "DocType", "engine": "InnoDB", "is_submittable": 1,
+ "actions": [],
+ "autoname": "format:CKP-{YY}-{#####}",
+ "creation": "2026-09-14 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "is_submittable": 1,
  "field_order": [
-  "company", "posting_date", "posting_time", "column_break_1", "bom", "product", "bom_quantity", "stock_uom",
-  "section_break_2", "batches", "produced_qty", "column_break_3", "source_warehouse", "target_warehouse",
-  "raw_material_section", "raw_materials", "total_raw_cost",
-  "output_section", "outputs", "total_output_weight", "column_break_4", "weight_difference",
-  "more_info_section", "remarks", "stock_entry", "amended_from"
+  "company",
+  "posting_date",
+  "posting_time",
+  "column_break_1",
+  "bom",
+  "product",
+  "bom_quantity",
+  "stock_uom",
+  "section_break_2",
+  "batches",
+  "produced_qty",
+  "column_break_3",
+  "source_warehouse",
+  "target_warehouse",
+  "raw_material_section",
+  "raw_materials",
+  "total_raw_cost",
+  "additional_cost_section",
+  "additional_costs",
+  "total_additional_cost",
+  "column_break_5",
+  "total_cost",
+  "output_section",
+  "outputs",
+  "total_output_weight",
+  "column_break_4",
+  "weight_difference",
+  "more_info_section",
+  "remarks",
+  "stock_entry",
+  "amended_from"
  ],
  "fields": [
-  {"fieldname": "company", "fieldtype": "Link", "label": "Company", "options": "Company", "reqd": 1, "default": "Hive International LLC"},
-  {"fieldname": "posting_date", "fieldtype": "Date", "label": "Date", "reqd": 1, "default": "Today"},
-  {"fieldname": "posting_time", "fieldtype": "Time", "label": "Time", "reqd": 1, "default": "Now"},
-  {"fieldname": "column_break_1", "fieldtype": "Column Break"},
-  {"fieldname": "bom", "fieldtype": "Link", "label": "Recipe (BOM)", "options": "BOM", "reqd": 1, "in_list_view": 1, "in_standard_filter": 1},
-  {"fieldname": "product", "fieldtype": "Link", "label": "Product", "options": "Item", "fetch_from": "bom.item", "read_only": 1, "in_list_view": 1},
-  {"fieldname": "bom_quantity", "fieldtype": "Float", "label": "BOM Quantity", "fetch_from": "bom.quantity", "read_only": 1},
-  {"fieldname": "stock_uom", "fieldtype": "Link", "label": "UOM", "options": "UOM", "fetch_from": "product.stock_uom", "read_only": 1},
-  {"fieldname": "section_break_2", "fieldtype": "Section Break"},
-  {"fieldname": "batches", "fieldtype": "Float", "label": "Batches", "default": "1", "reqd": 1, "description": "Raw materials = BOM quantity x batches"},
-  {"fieldname": "produced_qty", "fieldtype": "Float", "label": "Produced Qty (actual)", "reqd": 1, "in_list_view": 1},
-  {"fieldname": "column_break_3", "fieldtype": "Column Break"},
-  {"fieldname": "source_warehouse", "fieldtype": "Link", "label": "Raw Material Warehouse", "options": "Warehouse", "reqd": 1},
-  {"fieldname": "target_warehouse", "fieldtype": "Link", "label": "Finished Goods Warehouse", "options": "Warehouse", "reqd": 1},
-  {"fieldname": "raw_material_section", "fieldtype": "Section Break", "label": "Raw Materials Consumed"},
-  {"fieldname": "raw_materials", "fieldtype": "Table", "label": "Raw Materials", "options": "Central Kitchen Production Item", "reqd": 1},
-  {"fieldname": "total_raw_cost", "fieldtype": "Currency", "label": "Total Raw Material Cost", "read_only": 1, "options": "Company:company:default_currency"},
-  {"fieldname": "output_section", "fieldtype": "Section Break", "label": "Output (Packed Items)", "description": "Leave empty to receive the bulk product itself. Cost is split across outputs by weight."},
-  {"fieldname": "outputs", "fieldtype": "Table", "label": "Outputs", "options": "Central Kitchen Production Output"},
-  {"fieldname": "total_output_weight", "fieldtype": "Float", "label": "Total Packed Weight (Kg)", "read_only": 1},
-  {"fieldname": "column_break_4", "fieldtype": "Column Break"},
-  {"fieldname": "weight_difference", "fieldtype": "Float", "label": "Difference (Produced - Packed)", "read_only": 1},
-  {"fieldname": "more_info_section", "fieldtype": "Section Break", "collapsible": 1, "label": "More Information"},
-  {"fieldname": "remarks", "fieldtype": "Small Text", "label": "Remarks"},
-  {"fieldname": "stock_entry", "fieldtype": "Link", "label": "Stock Entry", "options": "Stock Entry", "read_only": 1, "no_copy": 1},
-  {"fieldname": "amended_from", "fieldtype": "Link", "label": "Amended From", "options": "Central Kitchen Production", "read_only": 1, "no_copy": 1, "print_hide": 1}
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1,
+   "default": "Hive International LLC"
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Date",
+   "reqd": 1,
+   "default": "Today"
+  },
+  {
+   "fieldname": "posting_time",
+   "fieldtype": "Time",
+   "label": "Time",
+   "reqd": 1,
+   "default": "Now"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "bom",
+   "fieldtype": "Link",
+   "label": "Recipe (BOM)",
+   "options": "BOM",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "product",
+   "fieldtype": "Link",
+   "label": "Product",
+   "options": "Item",
+   "fetch_from": "bom.item",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "bom_quantity",
+   "fieldtype": "Float",
+   "label": "BOM Quantity",
+   "fetch_from": "bom.quantity",
+   "read_only": 1
+  },
+  {
+   "fieldname": "stock_uom",
+   "fieldtype": "Link",
+   "label": "UOM",
+   "options": "UOM",
+   "fetch_from": "product.stock_uom",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "batches",
+   "fieldtype": "Float",
+   "label": "Batches",
+   "default": "1",
+   "reqd": 1,
+   "description": "Raw materials = BOM quantity x batches"
+  },
+  {
+   "fieldname": "produced_qty",
+   "fieldtype": "Float",
+   "label": "Produced Qty (actual)",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "Changing this rescales batches and raw materials"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "source_warehouse",
+   "fieldtype": "Link",
+   "label": "Raw Material Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "target_warehouse",
+   "fieldtype": "Link",
+   "label": "Finished Goods Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "raw_material_section",
+   "fieldtype": "Section Break",
+   "label": "Raw Materials Consumed"
+  },
+  {
+   "fieldname": "raw_materials",
+   "fieldtype": "Table",
+   "label": "Raw Materials",
+   "options": "Central Kitchen Production Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "total_raw_cost",
+   "fieldtype": "Currency",
+   "label": "Total Raw Material Cost",
+   "read_only": 1,
+   "options": "Company:company:default_currency"
+  },
+  {
+   "fieldname": "additional_cost_section",
+   "fieldtype": "Section Break",
+   "label": "Additional Costs (labour, gas, packaging)",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "additional_costs",
+   "fieldtype": "Table",
+   "label": "Additional Costs",
+   "options": "Central Kitchen Production Cost"
+  },
+  {
+   "fieldname": "total_additional_cost",
+   "fieldtype": "Currency",
+   "label": "Total Additional Cost",
+   "read_only": 1,
+   "options": "Company:company:default_currency"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_cost",
+   "fieldtype": "Currency",
+   "label": "Total Production Cost",
+   "read_only": 1,
+   "options": "Company:company:default_currency",
+   "bold": 1
+  },
+  {
+   "fieldname": "output_section",
+   "fieldtype": "Section Break",
+   "label": "Output (Packed Items)",
+   "description": "Leave empty to receive the bulk product itself. Total cost (raw + additional) is split across outputs by weight."
+  },
+  {
+   "fieldname": "outputs",
+   "fieldtype": "Table",
+   "label": "Outputs",
+   "options": "Central Kitchen Production Output"
+  },
+  {
+   "fieldname": "total_output_weight",
+   "fieldtype": "Float",
+   "label": "Total Packed Weight (Kg)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "weight_difference",
+   "fieldtype": "Float",
+   "label": "Difference (Produced - Packed)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "more_info_section",
+   "fieldtype": "Section Break",
+   "collapsible": 1,
+   "label": "More Information"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "stock_entry",
+   "fieldtype": "Link",
+   "label": "Stock Entry",
+   "options": "Stock Entry",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "options": "Central Kitchen Production",
+   "read_only": 1,
+   "no_copy": 1,
+   "print_hide": 1
+  }
  ],
- "links": [], "modified": "2026-09-14 12:00:00.000000", "modified_by": "Administrator", "module": "Hivefoods",
- "name": "Central Kitchen Production", "owner": "Administrator",
+ "links": [],
+ "modified": "2026-09-14 14:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Hivefoods",
+ "name": "Central Kitchen Production",
+ "owner": "Administrator",
  "permissions": [
-  {"create": 1, "delete": 1, "email": 1, "print": 1, "read": 1, "report": 1, "role": "System Manager", "share": 1, "write": 1, "submit": 1, "cancel": 1, "amend": 1},
-  {"create": 1, "delete": 1, "email": 1, "print": 1, "read": 1, "report": 1, "role": "Manufacturing User", "share": 1, "write": 1, "submit": 1, "cancel": 1, "amend": 1},
-  {"create": 1, "delete": 1, "email": 1, "print": 1, "read": 1, "report": 1, "role": "Stock User", "share": 1, "write": 1, "submit": 1, "cancel": 1, "amend": 1},
-  {"read": 1, "report": 1, "role": "Accounts User"}
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Manufacturing User",
+   "share": 1,
+   "write": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Stock User",
+   "share": 1,
+   "write": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1
+  },
+  {
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User"
+  }
  ],
- "sort_field": "modified", "sort_order": "DESC", "states": [], "track_changes": 1, "title_field": "product"
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "title_field": "product"
 }

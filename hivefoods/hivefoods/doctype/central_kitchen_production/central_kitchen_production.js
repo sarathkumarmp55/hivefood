@@ -4,6 +4,9 @@ frappe.ui.form.on("Central Kitchen Production", {
 		frm.set_query("source_warehouse", () => ({ filters: { company: frm.doc.company, is_group: 0 } }));
 		frm.set_query("target_warehouse", () => ({ filters: { company: frm.doc.company, is_group: 0 } }));
 		frm.set_query("item_code", "outputs", () => ({ filters: { is_stock_item: 1, disabled: 0 } }));
+		frm.set_query("expense_account", "additional_costs", () => ({
+			filters: { company: frm.doc.company, is_group: 0, root_type: ["in", ["Expense", "Liability"]] },
+		}));
 	},
 
 	refresh(frm) {
@@ -37,7 +40,10 @@ frappe.ui.form.on("Central Kitchen Production", {
 	},
 
 	batches(frm) {
-		frm.set_value("produced_qty", flt(frm.doc.bom_quantity) * flt(frm.doc.batches));
+		if (!frm._syncing) {
+			frm._syncing = true;
+			frm.set_value("produced_qty", flt(frm.doc.bom_quantity) * flt(frm.doc.batches)).then(() => { frm._syncing = false; });
+		}
 		(frm.doc.raw_materials || []).forEach((row) => {
 			if (row.required_qty && frm._bom_base) {
 				row.required_qty = flt(frm._bom_base[row.item_code] || 0) * flt(frm.doc.batches);
@@ -48,7 +54,11 @@ frappe.ui.form.on("Central Kitchen Production", {
 		hivefoods.ckp.refresh_rates(frm);
 	},
 
-	produced_qty(frm) { hivefoods.ckp.calc(frm); },
+	produced_qty(frm) {
+		if (frm._syncing || !flt(frm.doc.bom_quantity)) { hivefoods.ckp.calc(frm); return; }
+		frm._syncing = true;
+		frm.set_value("batches", flt(frm.doc.produced_qty) / flt(frm.doc.bom_quantity)).then(() => { frm._syncing = false; });
+	},
 	source_warehouse(frm) { hivefoods.ckp.refresh_rates(frm); },
 	posting_date(frm) { hivefoods.ckp.refresh_rates(frm); },
 });
@@ -57,6 +67,11 @@ frappe.ui.form.on("Central Kitchen Production Item", {
 	item_code(frm, cdt, cdn) { hivefoods.ckp.set_row_rate(frm, locals[cdt][cdn]); },
 	qty(frm, cdt, cdn) { hivefoods.ckp.set_row_rate(frm, locals[cdt][cdn]); },
 	raw_materials_remove(frm) { hivefoods.ckp.calc(frm); },
+});
+
+frappe.ui.form.on("Central Kitchen Production Cost", {
+	amount(frm) { hivefoods.ckp.calc(frm); },
+	additional_costs_remove(frm) { hivefoods.ckp.calc(frm); },
 });
 
 frappe.ui.form.on("Central Kitchen Production Output", {
@@ -127,13 +142,18 @@ hivefoods.ckp.set_row_rate = function (frm, row, silent) {
 hivefoods.ckp.calc = function (frm) {
 	let total_cost = 0;
 	(frm.doc.raw_materials || []).forEach((r) => { r.amount = flt(r.qty) * flt(r.rate); total_cost += r.amount; });
+	let additional = 0;
+	(frm.doc.additional_costs || []).forEach((c) => { additional += flt(c.amount); });
+	const grand = total_cost + additional;
 	let total_weight = 0;
 	(frm.doc.outputs || []).forEach((o) => { o.total_weight = flt(o.qty) * flt(o.weight_per_unit); total_weight += o.total_weight; });
 	(frm.doc.outputs || []).forEach((o) => {
-		o.amount = total_weight ? flt(total_cost * o.total_weight / total_weight, 3) : 0;
+		o.amount = total_weight ? flt(grand * o.total_weight / total_weight, 3) : 0;
 		o.rate = o.qty ? flt(o.amount / o.qty, 6) : 0;
 	});
 	frm.set_value("total_raw_cost", flt(total_cost, 3));
+	frm.set_value("total_additional_cost", flt(additional, 3));
+	frm.set_value("total_cost", flt(grand, 3));
 	frm.set_value("total_output_weight", flt(total_weight, 3));
 	frm.set_value("weight_difference", flt(frm.doc.produced_qty) - flt(total_weight, 3));
 	frm.refresh_field("raw_materials");

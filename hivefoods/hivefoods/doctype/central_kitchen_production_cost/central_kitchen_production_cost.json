@@ -1,0 +1,11 @@
+{
+ "actions": [], "creation": "2026-09-14 14:00:00.000000", "doctype": "DocType", "editable_grid": 1, "engine": "InnoDB",
+ "field_order": ["expense_account", "description", "amount"],
+ "fields": [
+  {"fieldname": "expense_account", "fieldtype": "Link", "in_list_view": 1, "label": "Expense Account", "options": "Account", "reqd": 1, "columns": 4},
+  {"fieldname": "description", "fieldtype": "Data", "in_list_view": 1, "label": "Description", "columns": 4},
+  {"fieldname": "amount", "fieldtype": "Currency", "in_list_view": 1, "label": "Amount", "reqd": 1, "columns": 2, "options": "Company:company:default_currency"}
+ ],
+ "istable": 1, "links": [], "modified": "2026-09-14 14:00:00.000000", "modified_by": "Administrator", "module": "Hivefoods",
+ "name": "Central Kitchen Production Cost", "owner": "Administrator", "permissions": [], "sort_field": "modified", "sort_order": "DESC", "states": []
+}
