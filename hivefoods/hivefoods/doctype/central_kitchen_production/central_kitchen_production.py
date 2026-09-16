@@ -9,7 +9,7 @@ split across the outputs by weight (qty x weight per unit).
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import flt, get_link_to_form
+from frappe.utils import add_days, cint, flt, get_link_to_form, getdate
 
 from erpnext.stock.utils import get_incoming_rate
 
@@ -102,6 +102,7 @@ class CentralKitchenProduction(Document):
 				)
 			row.total_weight = flt(row.qty) * flt(row.weight_per_unit)
 			self.total_output_weight += row.total_weight
+			self.set_expiry(row)
 		self.weight_difference = flt(self.produced_qty) - flt(self.total_output_weight)
 		if self.total_output_weight > flt(self.produced_qty) * 1.05:
 			frappe.throw(
@@ -109,6 +110,43 @@ class CentralKitchenProduction(Document):
 					self.total_output_weight, self.produced_qty
 				)
 			)
+
+	def set_expiry(self, row):
+		has_batch, has_expiry, shelf_life = frappe.get_cached_value(
+			"Item", row.item_code, ["has_batch_no", "has_expiry_date", "shelf_life_in_days"]
+		)
+		if not (has_batch and has_expiry):
+			row.expiry_date = None
+			return
+		if not row.expiry_date:
+			if not shelf_life:
+				frappe.throw(
+					_("Output row {0}: enter Expiry Date, or set Shelf Life in Days on Item {1}").format(
+						row.idx, row.item_code
+					)
+				)
+			row.expiry_date = add_days(self.posting_date, cint(shelf_life))
+		elif getdate(row.expiry_date) <= getdate(self.posting_date):
+			frappe.throw(_("Output row {0}: Expiry Date must be after the production date").format(row.idx))
+
+	def make_batch(self, row):
+		"""New batch for a batch-tracked finished item; the id comes from the Item's batch series."""
+		if not frappe.get_cached_value("Item", row.item_code, "has_batch_no"):
+			return None
+		batch = frappe.get_doc(
+			{
+				"doctype": "Batch",
+				"item": row.item_code,
+				"manufacturing_date": self.posting_date,
+				"expiry_date": row.expiry_date,
+				"reference_doctype": self.doctype,
+				"reference_name": self.name,
+			}
+		)
+		batch.flags.ignore_permissions = True
+		batch.insert()
+		row.db_set("batch_no", batch.name, update_modified=False)
+		return batch.name
 
 	def allocate_output_cost(self):
 		"""Split raw cost (posted as basic rate) and total cost (shown to the user) by weight."""
@@ -162,6 +200,7 @@ class CentralKitchenProduction(Document):
 				},
 			)
 		for row in self.outputs:
+			batch_no = self.make_batch(row)
 			se.append(
 				"items",
 				{
@@ -169,6 +208,8 @@ class CentralKitchenProduction(Document):
 					"qty": row.qty,
 					"uom": row.uom,
 					"t_warehouse": self.target_warehouse,
+					"batch_no": batch_no,
+					"use_serial_batch_fields": 1 if batch_no else 0,
 					"is_finished_item": 1,
 					"set_basic_rate_manually": 1,
 					"basic_rate": flt(row.raw_amount / flt(row.qty), 6) if row.qty else 0,

@@ -9,6 +9,8 @@
   "item_name",
   "uom",
   "qty",
+  "batch_no",
+  "expiry_date",
   "weight_per_unit",
   "total_weight",
   "rate",
@@ -23,7 +25,7 @@
    "label": "Finished Item",
    "options": "Item",
    "reqd": 1,
-   "columns": 3
+   "columns": 2
   },
   {
    "fieldname": "item_name",
@@ -49,6 +51,22 @@
    "columns": 1
   },
   {
+   "fieldname": "batch_no",
+   "fieldtype": "Link",
+   "label": "Batch",
+   "options": "Batch",
+   "read_only": 1,
+   "in_list_view": 1,
+   "columns": 2,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "expiry_date",
+   "fieldtype": "Date",
+   "label": "Expiry Date",
+   "description": "Blank = production date + Item shelf life"
+  },
+  {
    "fieldname": "weight_per_unit",
    "fieldtype": "Float",
    "in_list_view": 1,
@@ -60,7 +78,7 @@
   {
    "fieldname": "total_weight",
    "fieldtype": "Float",
-   "in_list_view": 1,
+   "in_list_view": 0,
    "label": "Total Weight (Kg)",
    "read_only": 1,
    "columns": 2
@@ -68,7 +86,7 @@
   {
    "fieldname": "rate",
    "fieldtype": "Currency",
-   "in_list_view": 1,
+   "in_list_view": 0,
    "label": "Cost / Unit",
    "read_only": 1,
    "columns": 2,
