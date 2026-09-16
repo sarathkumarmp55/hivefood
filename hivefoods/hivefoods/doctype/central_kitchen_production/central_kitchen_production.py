@@ -18,8 +18,18 @@ class CentralKitchenProduction(Document):
 	# ----------------------------------------------------------------- validate
 	def validate(self):
 		self.validate_warehouses()
+		if not self.raw_materials:
+			frappe.throw(_("Add at least one raw material or bulk item to consume"))
+		if not self.bom and not self.outputs:
+			frappe.throw(_("Without a recipe, add the packed items under Output"))
 		if not self.produced_qty:
 			self.produced_qty = flt(self.batches) * flt(self.bom_quantity)
+		if not self.produced_qty and not self.bom:
+			# packing entry: produced qty = weight of bulk consumed
+			self.produced_qty = sum(
+				flt(r.qty) * flt(frappe.get_cached_value("Item", r.item_code, "weight_per_unit") or 1)
+				for r in self.raw_materials
+			)
 		self.set_required_qty()
 		self.set_raw_material_rates()
 		self.set_additional_costs()
@@ -55,10 +65,17 @@ class CentralKitchenProduction(Document):
 			row.uom = frappe.get_cached_value("Item", row.item_code, "stock_uom")
 			if flt(row.qty) <= 0:
 				frappe.throw(_("Row {0}: Actual Qty must be greater than 0").format(row.idx))
-			row.rate = get_valuation_rate(
-				row.item_code, self.source_warehouse, self.posting_date, self.posting_time, self.company, row.qty
-			)
-			row.amount = flt(row.qty) * flt(row.rate)
+			picked = pick_batches(row.item_code, self.source_warehouse, row.qty, self.posting_date, self.posting_time, self.company)
+			if picked:
+				row.amount = flt(sum(b["qty"] * b["rate"] for b in picked))
+				row.rate = flt(row.amount / flt(row.qty), 6)
+				row.batch_no = ", ".join(f"{b['batch_no']} ({b['qty']})" for b in picked)
+			else:
+				row.rate = get_valuation_rate(
+					row.item_code, self.source_warehouse, self.posting_date, self.posting_time, self.company, row.qty
+				)
+				row.amount = flt(row.qty) * flt(row.rate)
+				row.batch_no = None
 			self.total_raw_cost += row.amount
 		self.total_raw_cost = flt(self.total_raw_cost, self.precision("total_raw_cost"))
 
@@ -189,16 +206,20 @@ class CentralKitchenProduction(Document):
 		se.posting_time = self.posting_time
 		se.remarks = _("Central Kitchen Production {0}").format(self.name)
 		for row in self.raw_materials:
-			se.append(
-				"items",
-				{
-					"item_code": row.item_code,
-					"qty": row.qty,
-					"uom": row.uom,
-					"s_warehouse": self.source_warehouse,
-					"conversion_factor": 1,
-				},
-			)
+			picked = pick_batches(row.item_code, self.source_warehouse, row.qty, self.posting_date, self.posting_time, self.company)
+			for part in picked or [{"batch_no": None, "qty": row.qty}]:
+				se.append(
+					"items",
+					{
+						"item_code": row.item_code,
+						"qty": part["qty"],
+						"uom": row.uom,
+						"s_warehouse": self.source_warehouse,
+						"batch_no": part["batch_no"],
+						"use_serial_batch_fields": 1 if part["batch_no"] else 0,
+						"conversion_factor": 1,
+					},
+				)
 		for row in self.outputs:
 			batch_no = self.make_batch(row)
 			se.append(
@@ -229,14 +250,46 @@ class CentralKitchenProduction(Document):
 			)
 		se.flags.ignore_permissions = True
 		se.insert()
+		self.sync_actual_cost(se)
 		se.submit()
-		# keep the rates ERPNext actually posted for the outgoing rows
-		posted = {d.item_code: d for d in se.items if d.s_warehouse}
-		for row in self.raw_materials:
-			d = posted.get(row.item_code)
-			if d:
-				row.db_set({"rate": d.basic_rate, "amount": d.amount}, update_modified=False)
 		return se
+
+	def sync_actual_cost(self, se):
+		"""ERPNext values the outgoing rows on insert (batch/FIFO specific), which can differ
+		from the estimate shown on the form. Re-split the actual raw cost across the outputs
+		before submitting so the finished goods carry exactly what was consumed."""
+		out_rows = [d for d in se.items if d.s_warehouse]
+		fg_rows = [d for d in se.items if d.t_warehouse and not d.s_warehouse]
+		actual_raw = flt(sum(flt(d.basic_amount) for d in out_rows), self.precision("total_raw_cost"))
+		precision = self.precision("total_raw_cost")
+		total_weight = flt(self.total_output_weight)
+		allocated = 0
+		for i, (row, d) in enumerate(zip(self.outputs, fg_rows)):
+			if i == len(fg_rows) - 1:
+				raw_amount = flt(actual_raw - allocated, precision)
+			else:
+				raw_amount = flt(actual_raw * flt(row.total_weight) / total_weight, precision) if total_weight else 0
+				allocated += raw_amount
+			d.basic_rate = flt(raw_amount / flt(d.qty), 6) if d.qty else 0
+			d.basic_amount = d.amount = raw_amount
+			row.db_set({"raw_amount": raw_amount, "amount": flt(raw_amount + (flt(self.total_additional_cost) * flt(row.total_weight) / total_weight if total_weight else 0), precision)}, update_modified=False)
+			row.db_set("rate", flt(row.amount / flt(row.qty), 6) if row.qty else 0, update_modified=False)
+		by_item = {}
+		for d in out_rows:
+			by_item.setdefault(d.item_code, []).append(d)
+		for row in self.raw_materials:
+			parts = by_item.get(row.item_code) or []
+			amount = flt(sum(flt(d.basic_amount) for d in parts), precision)
+			row.db_set(
+				{
+					"rate": flt(amount / flt(row.qty), 6) if row.qty else 0,
+					"amount": amount,
+					"batch_no": ", ".join(f"{d.batch_no} ({d.qty})" for d in parts if d.batch_no) or None,
+				},
+				update_modified=False,
+			)
+		self.db_set({"total_raw_cost": actual_raw, "total_cost": flt(actual_raw + flt(self.total_additional_cost), precision)}, update_modified=False)
+		se.save()
 
 
 # --------------------------------------------------------------------- api
@@ -258,6 +311,56 @@ def get_valuation_rate(item_code, warehouse, posting_date, posting_time, company
 			raise_error_if_no_rate=False,
 		)
 	)
+
+
+def pick_batches(item_code, warehouse, qty, posting_date, posting_time, company):
+	"""FEFO/FIFO batch split (Stock Settings basis) with the batch-wise valuation rate.
+	Returns [] for items that are not batch tracked."""
+	if not frappe.get_cached_value("Item", item_code, "has_batch_no"):
+		return []
+	from erpnext.stock.doctype.serial_and_batch_bundle.serial_and_batch_bundle import get_auto_batch_nos
+
+	based_on = frappe.db.get_single_value("Stock Settings", "pick_serial_and_batch_based_on") or "FIFO"
+	batches = get_auto_batch_nos(
+		frappe._dict(
+			item_code=item_code,
+			warehouse=warehouse,
+			qty=flt(qty),
+			based_on=based_on,
+			posting_date=posting_date,
+			posting_time=posting_time,
+			company=company,
+		)
+	)
+	picked = []
+	for b in batches or []:
+		if flt(b.qty) <= 0:
+			continue
+		rate = flt(
+			get_incoming_rate(
+				{
+					"item_code": item_code,
+					"warehouse": warehouse,
+					"posting_date": posting_date,
+					"posting_time": posting_time,
+					"qty": -1 * flt(b.qty),
+					"batch_no": b.batch_no,
+					"company": company,
+					"voucher_type": "Stock Entry",
+					"allow_zero_valuation": 1,
+				},
+				raise_error_if_no_rate=False,
+			)
+		)
+		picked.append({"batch_no": b.batch_no, "qty": flt(b.qty), "rate": rate})
+	total = sum(p["qty"] for p in picked)
+	if picked and total < flt(qty):
+		frappe.throw(
+			_("Only {0} {1} available in batches of {2} at {3}; {4} needed").format(
+				total, frappe.get_cached_value("Item", item_code, "stock_uom"), item_code, warehouse, qty
+			)
+		)
+	return picked
 
 
 @frappe.whitelist()
