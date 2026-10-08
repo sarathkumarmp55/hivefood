@@ -107,26 +107,34 @@ def make_receipt(doc, shortfalls, settings):
 def sync_pos_profiles(settings, method=None):
 	"""Hivefoods Settings.on_update.
 
-	POS Awesome (screen and its submit API) refuses a sale beyond available qty unless
-	Stock Settings > Allow Negative Stock is on, whatever the profile flags say. So the switch
-	also drives that setting: ON -> allow negative stock (the auto receipt keeps real stock from
-	going negative on sales), OFF -> block negative stock again.
+	POS Awesome (screen + its submit API) lets a sale go beyond available qty only when the
+	item's own "Allow Negative Stock" flag is set (or the global one, which we do not touch).
+	So the switch sets that flag on every stock item while ON and clears it when OFF. The
+	auto receipt posts stock before the sale, so real stock never goes negative on sales.
 	"""
 	on = cint(settings.get(SETTING))
-	current = cint(frappe.db.get_single_value("Stock Settings", "allow_negative_stock"))
-	if on != current:
-		frappe.db.set_single_value("Stock Settings", "allow_negative_stock", on)
-		frappe.msgprint(
-			_("Stock Settings > Allow Negative Stock switched {0}").format(_("ON") if on else _("OFF")), alert=True
-		)
+	if not frappe.get_meta("Item").has_field("allow_negative_stock"):
+		return
+	changed = frappe.db.sql(
+		"""update `tabItem` set allow_negative_stock=%s
+		   where is_stock_item=1 and disabled=0 and ifnull(allow_negative_stock,0)!=%s""",
+		(on, on),
+	)
+	frappe.clear_cache(doctype="Item")
+	frappe.msgprint(
+		_("Allow Negative Stock on items switched {0} (auto receipt {1})").format(
+			_("ON") if on else _("OFF"), _("enabled") if on else _("disabled")
+		),
+		alert=True,
+	)
 	if not on:
 		return
 	fields = [f for f in ("validate_stock_on_save", "posa_block_sale_beyond_available_qty") if frappe.get_meta("POS Profile").has_field(f)]
-	changed = []
+	profiles = []
 	for name in frappe.get_all("POS Profile", filters={"disabled": 0}, pluck="name"):
 		vals = frappe.db.get_value("POS Profile", name, fields, as_dict=True)
 		if any(cint(vals.get(f)) for f in fields):
 			frappe.db.set_value("POS Profile", name, {f: 0 for f in fields})
-			changed.append(name)
-	if changed:
-		frappe.msgprint(_("POS Profiles updated to allow sale beyond available qty: {0}").format(", ".join(changed)), alert=True)
+			profiles.append(name)
+	if profiles:
+		frappe.msgprint(_("POS Profiles updated to allow sale beyond available qty: {0}").format(", ".join(profiles)), alert=True)
