@@ -105,8 +105,21 @@ def make_receipt(doc, shortfalls, settings):
 
 
 def sync_pos_profiles(settings, method=None):
-	"""Hivefoods Settings.on_update: when the switch is ON the POS screen must not block the sale."""
-	if not cint(settings.get(SETTING)):
+	"""Hivefoods Settings.on_update.
+
+	POS Awesome (screen and its submit API) refuses a sale beyond available qty unless
+	Stock Settings > Allow Negative Stock is on, whatever the profile flags say. So the switch
+	also drives that setting: ON -> allow negative stock (the auto receipt keeps real stock from
+	going negative on sales), OFF -> block negative stock again.
+	"""
+	on = cint(settings.get(SETTING))
+	current = cint(frappe.db.get_single_value("Stock Settings", "allow_negative_stock"))
+	if on != current:
+		frappe.db.set_single_value("Stock Settings", "allow_negative_stock", on)
+		frappe.msgprint(
+			_("Stock Settings > Allow Negative Stock switched {0}").format(_("ON") if on else _("OFF")), alert=True
+		)
+	if not on:
 		return
 	fields = [f for f in ("validate_stock_on_save", "posa_block_sale_beyond_available_qty") if frappe.get_meta("POS Profile").has_field(f)]
 	changed = []
