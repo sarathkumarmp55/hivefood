@@ -96,7 +96,7 @@ hivefoods.ckp.set_default_warehouses = function (frm) {
 	frappe.db.get_value("Company", frm.doc.company, "abbr").then((r) => {
 		const abbr = r.message.abbr;
 		if (!frm.doc.source_warehouse) frm.set_value("source_warehouse", `Stores - ${abbr}`);
-		if (!frm.doc.target_warehouse) frm.set_value("target_warehouse", `Finished Goods - ${abbr}`);
+		if (!frm.doc.target_warehouse) frm.set_value("target_warehouse", `Stores - ${abbr}`);
 	});
 };
 
