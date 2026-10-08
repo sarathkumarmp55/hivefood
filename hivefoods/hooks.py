@@ -146,9 +146,13 @@ doc_events = {
 	"Customer": {"validate": "hivefoods.tax_defaults.set_party_tax_category"},
 	"Supplier": {"validate": "hivefoods.tax_defaults.set_party_tax_category"},
 	"Sales Invoice": {
+		"before_validate": "hivefoods.auto_receipt.before_submit_check",
 		"on_submit": "hivefoods.intercompany.on_sales_invoice_submit",
 		"on_cancel": "hivefoods.intercompany.on_sales_invoice_cancel",
 	},
+	"POS Invoice": {"before_validate": "hivefoods.auto_receipt.before_submit_check"},
+	"Delivery Note": {"before_validate": "hivefoods.auto_receipt.before_submit_check"},
+	"Hivefoods Settings": {"on_update": "hivefoods.auto_receipt.sync_pos_profiles"},
 }
 
 # doc_events = {
