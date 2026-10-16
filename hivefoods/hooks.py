@@ -5,6 +5,19 @@ app_description = "hivefoods"
 app_email = "sammish.thundiyil@gmail.com"
 app_license = "mit"
 
+# Fixtures
+# ------------------
+# Property setters that must survive other apps' fixture re-installs (POS Awesome resets
+# its Customer.posa_referral_company custom field on every deploy; branch users with a
+# Company user permission then lose access to every Customer).
+fixtures = [
+	{"dt": "Property Setter", "filters": [["name", "in", [
+		"Customer-posa_referral_company-ignore_user_permissions",
+		"Communication-company-ignore_user_permissions",
+		"Email Account-company-ignore_user_permissions",
+	]]]},
+]
+
 # Apps
 # ------------------
 

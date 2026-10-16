@@ -1,0 +1,38 @@
+[
+ {
+  "doctype": "Property Setter",
+  "name": "Customer-posa_referral_company-ignore_user_permissions",
+  "doc_type": "Customer",
+  "doctype_or_field": "DocField",
+  "field_name": "posa_referral_company",
+  "property": "ignore_user_permissions",
+  "property_type": "Check",
+  "value": "1",
+  "module": "Hivefoods",
+  "is_system_generated": 0
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Communication-company-ignore_user_permissions",
+  "doc_type": "Communication",
+  "doctype_or_field": "DocField",
+  "field_name": "company",
+  "property": "ignore_user_permissions",
+  "property_type": "Check",
+  "value": "1",
+  "module": "Hivefoods",
+  "is_system_generated": 0
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Email Account-company-ignore_user_permissions",
+  "doc_type": "Email Account",
+  "doctype_or_field": "DocField",
+  "field_name": "company",
+  "property": "ignore_user_permissions",
+  "property_type": "Check",
+  "value": "1",
+  "module": "Hivefoods",
+  "is_system_generated": 0
+ }
+]
